@@ -84,9 +84,7 @@ func main() {
 				continue
 			}
 			tempPath := tempName()
-			defer os.Remove(tempPath)
 			processedPath := tempPath + "_inverted" + suffix
-			defer os.Remove(processedPath)
 
 			client.FGetObject(ctx, inputImagesBucket, key, tempPath, minio.GetObjectOptions{})
 			image, err := imaging.Open(tempPath)
@@ -97,6 +95,8 @@ func main() {
 			info, err := client.FPutObject(ctx, invertedImagesBucket, key, processedPath, minio.PutObjectOptions{})
 			check(err, "CANNOT UPLOAD OBJECT")
 			log("INFO", "Uploaded %s (size: %d)", info.Key, info.Size)
+			os.Remove(tempPath)
+			os.Remove(processedPath)
 		}
 	}
 }
