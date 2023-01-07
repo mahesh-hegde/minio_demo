@@ -35,13 +35,14 @@ func log(level string, message string, args ...any) {
 }
 
 const (
-	endpoint             = "localhost:9000"
+	localEndPoint        = "localhost:9000"
 	inputImagesBucket    = "input-images"
 	invertedImagesBucket = "inverted-images"
 )
 
 var accessKey = os.Getenv("MINIO_ACCESSKEY")
 var secretKey = os.Getenv("MINIO_SECRETKEY")
+var endpoint = os.Getenv("MINIO_ENDPOINT")
 
 func tempName() string {
 	tempFile, err := os.CreateTemp(".", "image_listener_temp_")
@@ -52,10 +53,13 @@ func tempName() string {
 }
 
 func main() {
-
 	if accessKey == "" || secretKey == "" {
 		log("ERROR", "please set MINIO_ACCESSKEY and MINIO_SECRETKEY")
 		return
+	}
+
+	if endpoint == "" {
+		endpoint = localEndPoint
 	}
 
 	ctx := context.Background()

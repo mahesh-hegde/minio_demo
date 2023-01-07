@@ -39,7 +39,7 @@ func log(level string, message string, args ...any) {
 }
 
 const (
-	endpoint             = "localhost:9000"
+	localEndPoint        = "localhost:9000"
 	inputImagesBucket    = "input-images"
 	invertedImagesBucket = "inverted-images"
 	versioningDemoBucket = "versioning-demo"
@@ -48,6 +48,7 @@ const (
 
 var accessKey = os.Getenv("MINIO_ACCESSKEY")
 var secretKey = os.Getenv("MINIO_SECRETKEY")
+var endpoint = os.Getenv("MINIO_ENDPOINT")
 
 func createBucketIfNotExists(ctx context.Context, client *minio.Client,
 	bucketName string) {
@@ -146,7 +147,17 @@ func uploadFileToMetadataBucket(ctx context.Context, client *minio.Client) {
 }
 
 func main() {
+	if accessKey == "" || secretKey == "" {
+		log("ERROR", "please set MINIO_ACCESSKEY and MINIO_SECRETKEY")
+		return
+	}
+
+	if endpoint == "" {
+		endpoint = localEndPoint
+	}
+
 	ctx := context.Background()
+
 	client, err := minio.New(endpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(accessKey, secretKey, ""),
 	})
