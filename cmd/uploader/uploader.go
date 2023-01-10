@@ -6,6 +6,8 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"time"
+	"net/url"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"mime"
@@ -131,9 +133,9 @@ func listAllBuckets(ctx context.Context, client *minio.Client) {
 func downloadFile(ctx context.Context, client *minio.Client) {
 	var bucket, name string
 	fmt.Println("Enter bucket name & object name")
-	fmt.Scanln(&bucket, &name)
-	out := getFileInput(true)
-	err := client.FGetObject(ctx, bucket, name, out, minio.GetObjectOptions{})
+	fmt.Scanf("%s %s", &bucket, &name)
+	u, err := client.PresignedGetObject(ctx, bucket, name, time.Minute * 5, url.Values{});
+	fmt.Println(u)
 	check(err, "Cannot download object.")
 }
 
